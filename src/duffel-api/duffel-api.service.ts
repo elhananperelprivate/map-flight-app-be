@@ -1,5 +1,5 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Duffel } from '@duffel/api';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Duffel, DuffelError } from '@duffel/api';
 
 @Injectable()
 export class DuffelApiService {
@@ -26,6 +26,40 @@ export class DuffelApiService {
     } catch (e) {
       console.log(e);
       return { error: e };
+    }
+  }
+
+  async getCheapestFlights(
+    originAirport: string,
+    destinationAirport: string,
+    date: string,
+  ) {
+    try {
+      const offerRequest = await this.duffelAPI.offerRequests.create({
+        slices: [
+          {
+            origin: originAirport,
+            destination: destinationAirport,
+            departure_date: new Date(date).toISOString().slice(0, 10),
+          },
+        ],
+        passengers: [{ age: 21 }],
+        return_offers: false,
+      });
+
+      const cheapestOffer = await this.duffelAPI.offers.list({
+        offer_request_id: offerRequest.data.id,
+        sort: 'total_amount',
+        limit: 5,
+      });
+
+      return { data: cheapestOffer.data[0] };
+    } catch (error: unknown) {
+      if (error instanceof DuffelError) {
+        return { error: error };
+      }
+
+      return new BadRequestException();
     }
   }
 }

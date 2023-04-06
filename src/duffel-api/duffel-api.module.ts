@@ -4,11 +4,7 @@ import { DuffelApiService } from './duffel-api.service';
 import { DuffelModule } from '../shared/duffel/duffel.module';
 
 @Module({
-  imports: [
-    DuffelModule.register(
-      'duffel_test_aMdWgI3I6kFYbAWCDEmKOma4HA999VMbsg5UOu6YYIr',
-    ),
-  ],
+  imports: [DuffelModule.register(process.env.DUFFEL_API_KEY)],
   controllers: [DuffelApiController],
   providers: [DuffelApiService],
 })

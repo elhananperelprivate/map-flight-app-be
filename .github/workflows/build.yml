@@ -3,14 +3,14 @@ name: Build and Deploy NestJS App
 on:
   push:
     branches:
-      - master
+      - master  # Change branch to master
 
 jobs:
   build:
     runs-on: ubuntu-latest
     
     steps:
-      # Step 1: Checkout the repository
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -18,18 +18,19 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x' # Ensure this matches the Node.js version of your project
+          node-version: '18.x'  # Update Node.js version to 18
 
       # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Step 4: Set environment variables from GitHub Secrets
-      - name: Set environment variables
-        run: |
-          echo "AMADEUS_API_KEY=${{ secrets.AMADEUS_API_KEY }}" >> $GITHUB_ENV
-          echo "AMADEUS_API_SECRET=${{ secrets.AMADEUS_API_SECRET }}" >> $GITHUB_ENV
-
-      # Step 5: Build the project
+      # Step 4: Build the project
       - name: Build the project
         run: npm run build
+
+      # Step 5: Upload dist/ directory as artifact
+      - name: Upload dist directory
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-files
+          path: dist/
